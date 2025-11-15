@@ -1,8 +1,84 @@
-# Omakase Ruby styling for Rails
-inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+plugins:
+  - rubocop-rails
+  - rubocop-rspec
+  - rubocop-performance
 
-# Overwrite or add rules to create your own house style
-#
-# # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
-# Layout/SpaceInsideArrayLiteralBrackets:
-#   Enabled: false
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.4
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/migrate/**/*'
+    - 'config/**/*'
+    - 'bin/**/*'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+
+# Disable documentation requirement for API project
+Style/Documentation:
+  Enabled: false
+
+# Frozen string literal comment not needed in Ruby 3.4
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# Allow longer method lengths for API controllers
+Metrics/MethodLength:
+  Max: 15
+  Exclude:
+    - 'db/migrate/**/*'
+
+# Allow longer blocks in specs and routes
+Metrics/BlockLength:
+  Exclude:
+    - 'spec/**/*'
+    - 'config/routes.rb'
+    - 'config/environments/*'
+
+# Allow longer classes for controllers and models
+Metrics/ClassLength:
+  Max: 150
+  Exclude:
+    - 'spec/**/*'
+
+# Use double quotes consistently
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+# Use double quotes in interpolation
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+
+# Prefer modern hash syntax
+Style/HashSyntax:
+  EnforcedStyle: ruby19
+
+# Allow both formats for numeric literals
+Style/NumericLiterals:
+  Enabled: false
+
+# Rails-specific configurations
+Rails:
+  Enabled: true
+
+Rails/UnknownEnv:
+  Environments:
+    - production
+    - development
+    - test
+
+# RSpec-specific configurations
+RSpec/ExampleLength:
+  Max: 10
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/NestedGroups:
+  Max: 4
+
+# Performance cops
+Performance:
+  Enabled: true
