@@ -5,6 +5,7 @@ plugins:
 
 AllCops:
   NewCops: enable
+  SuggestExtensions: false
   TargetRubyVersion: 3.4
   Exclude:
     - 'db/schema.rb'
@@ -22,6 +23,10 @@ Style/Documentation:
 
 # Frozen string literal comment not needed in Ruby 3.4
 Style/FrozenStringLiteralComment:
+  Enabled: false
+
+# use Shoulda for one-liners
+RSpec/ImplicitExpect:
   Enabled: false
 
 # Allow longer method lengths for API controllers
