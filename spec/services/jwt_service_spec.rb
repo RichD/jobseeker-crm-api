@@ -3,10 +3,12 @@ require "rails_helper"
 RSpec.describe JwtService, type: :service do
   let(:data) { { data: "test" } }
 
-  describe ".encode" do
-    it "returns an encoded string" do
-      expect(described_class.encode(data)).to match(/^\S*$/)
-    end
+  describe "encode/decode round-trip" do
+    subject(:decoded) { described_class.decode(token) }
+
+    let(:token) { described_class.encode(data) }
+
+    it { is_expected.to include("data" => "test") }
   end
 
   describe ".decode" do

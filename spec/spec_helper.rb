@@ -21,6 +21,8 @@ RSpec.configure do |config|
     add_filter "/db/"
     add_filter "/spec/"
     add_filter "/config/"
+    add_filter "/app/jobs/"
+    add_filter "/app/mailers/"
   end
 
   # rspec-expectations config goes here. You can use an alternate

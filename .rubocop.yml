@@ -17,6 +17,10 @@ AllCops:
     - 'tmp/**/*'
     - 'log/**/*'
 
+# No splitting nested class parts across lines
+Style/ClassAndModuleChildren:
+  EnforcedStyle: compact
+
 # Disable documentation requirement for API project
 Style/Documentation:
   Enabled: false

@@ -33,3 +33,6 @@
 
 # Ignore Simplecov artifacts
 coverage
+
+# Ignore byebug artifacts
+.byebug_history
