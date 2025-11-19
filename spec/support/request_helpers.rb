@@ -5,6 +5,10 @@ module RequestHelpers
   end
 
   def json_response
-    response.parsed_body if response.body.present?
+    if response&.body.present?
+      response.parsed_body
+    else
+      {}
+    end
   end
 end

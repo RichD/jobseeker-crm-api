@@ -30,6 +30,9 @@ gem "sidekiq"
 # Boot time optimization through caching. [https://github.com/Shopify/bootsnap]
 gem "bootsnap", require: false
 
+# Agnostic pagination in plain ruby [https://github.com/ddnexus/pagy]
+gem "pagy", "~> 43.0"
+
 group :development, :test do
   # Static analysis scanner for security vulnerabilities. [https://brakemanscanner.org]
   gem "brakeman", require: false

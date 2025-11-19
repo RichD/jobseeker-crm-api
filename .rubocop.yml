@@ -86,7 +86,7 @@ RSpec/MultipleExpectations:
   Max: 5
 
 RSpec/NestedGroups:
-  Max: 4
+  Max: 5
 
 RSpec/LetSetup:
   Enabled: true

@@ -5,25 +5,346 @@ RSpec.describe "Api::V1::Jobs", type: :request do
   let(:headers) { auth_headers_for(user) }
 
   describe "GET /api/v1/jobs" do
-    let(:another_user) { create(:user) }
+    context "without params" do
+      let(:another_user) { create(:user) }
 
-    before do
-      create(:job, user: user)
-      create(:job, user: user)
-      create(:job, user: another_user)
-      get api_v1_jobs_path, headers: headers
+      before do
+        create(:job, user: user)
+        create(:job, user: user)
+        create(:job, user: another_user)
+        get api_v1_jobs_path, headers: headers
+      end
+
+      it "returns 200" do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns array of jobs" do
+        expect(json_response["jobs"]).to be_an(Array)
+      end
+
+      it "returns only current user's jobs" do
+        expect(json_response["jobs"].size).to eq(2)
+      end
     end
 
-    it "returns 200" do
-      expect(response).to have_http_status(:ok)
+    context "with search param q" do
+      let!(:senior_dev) do
+        create(:job, user: user, title: "Senior Developer", company: "TechCo")
+      end
+
+      let!(:consulting_job) do
+        create(:job, user: user, title: "Manager", company: "Consulting Group")
+      end
+
+      let!(:engineer_role) do
+        create(
+          :job,
+          user: user,
+          title: "Software Engineer",
+          company: "Engineering Inc"
+        )
+      end
+
+      it "returns jobs matching title" do
+        get api_v1_jobs_path, headers: headers, params: { q: "Senior" }
+
+        expect(json_response["jobs"].pluck("id")).to contain_exactly(senior_dev.id)
+      end
+
+      it "returns jobs matching company" do
+        get api_v1_jobs_path, headers: headers, params: { q: "Consulting" }
+
+        expect(json_response["jobs"].pluck("id")).to contain_exactly(consulting_job.id)
+      end
+
+      it "returns jobs matching title and/or company" do
+        get api_v1_jobs_path, headers: headers, params: { q: "Engineer" }
+
+        expect(json_response["jobs"].pluck("id")).to contain_exactly(engineer_role.id)
+      end
+
+      it "is case-insensitive" do
+        get api_v1_jobs_path, headers: headers, params: { q: "senior" }
+
+        expect(json_response["jobs"].pluck("id")).to contain_exactly(senior_dev.id)
+      end
     end
 
-    it "returns array of jobs" do
-      expect(json_response["jobs"]).to be_an(Array)
+    context "with filter params" do
+      context "when filtering by status" do
+        let!(:applied_job) { create(:job, user: user, status: :applied) }
+        let(:params) { { status: "applied" } }
+
+        before do
+          create(:job, user: user, status: :saved)
+          create(:job, user: user, status: :interviewing)
+          get api_v1_jobs_path, headers: headers, params: { status: "applied" }
+        end
+
+        it "filters by status" do
+          expect(json_response["jobs"].count).to eq(1)
+          expect(json_response["jobs"].first["id"]).to eq(applied_job.id)
+        end
+      end
+
+      context "when filtering by location (remote)" do
+        let!(:remote_job) { create(:job, user: user, location: "Remote") }
+
+        before do
+          create(:job, user: user, location: "San Diego, CA")
+
+          get api_v1_jobs_path,
+              headers: headers,
+              params: { location: "remote" }
+        end
+
+        it "filters by location (case-insensitive)" do
+          expect(json_response["jobs"].size).to eq(1)
+          expect(json_response["jobs"].first["id"]).to eq(remote_job.id)
+        end
+      end
+
+      context "when filtering by location (San Diego)" do
+        let!(:san_diego_job) do
+          create(:job, user: user, location: "San Diego, CA")
+        end
+
+        let!(:san_diego_county_job) do
+          create(:job, user: user, location: "San Diego County")
+        end
+
+        before do
+          create(:job, user: user, location: "Remote")
+
+          get api_v1_jobs_path,
+              headers: headers,
+              params: { location: "San Diego" }
+        end
+
+        it "filters by location (partial match)" do
+          expect(json_response["jobs"].size).to eq(2)
+          expect(json_response["jobs"].map { |j| j["id"] })
+            .to contain_exactly(san_diego_job.id, san_diego_county_job.id)
+        end
+      end
+
+      context "when filtering by applied_at range" do
+        let!(:recent_app) { create(:job, user: user, applied_at: 1.week.ago) }
+        let!(:old_app) { create(:job, user: user, applied_at: 3.months.ago) }
+
+        before do
+          create(:job, user: user, applied_at: nil)
+          get api_v1_jobs_path, headers: headers, params: params
+        end
+
+        context "with only applied_from" do
+          let(:params) { { applied_from: 2.months.ago.to_date } }
+
+          it "returns jobs newer than applied_from" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to contain_exactly(recent_app.id)
+          end
+        end
+
+        context "with only applied_to" do
+          let(:params) { { applied_to: 2.months.ago.to_date } }
+
+          it "returns jobs older than applied_to" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to contain_exactly(old_app.id)
+          end
+        end
+
+        context "with applied_from and applied_to" do
+          let(:params) do
+            {
+              applied_from: 4.months.ago.to_date,
+              applied_to: 1.day.ago.to_date
+            }
+          end
+
+          it "returns jobs between applied_from and applied_to" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to contain_exactly(old_app.id, recent_app.id)
+          end
+        end
+      end
     end
 
-    it "returns only current user's jobs" do
-      expect(json_response["jobs"].size).to eq(2)
+    context "with sort params" do
+      context "when sorting by created_at" do
+        let!(:newest) { create(:job, user: user, created_at: 1.day.ago) }
+        let!(:oldest) { create(:job, user: user, created_at: 3.weeks.ago) }
+
+        before do
+          get api_v1_jobs_path, headers: headers, params: params
+        end
+
+        context "without order param" do
+          let(:params) { { sort_by: "created_at" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([newest.id, oldest.id])
+          end
+        end
+
+        context "with order asc" do
+          let(:params) { { sort_by: "created_at", order: "asc" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([oldest.id, newest.id])
+          end
+        end
+
+        context "with order desc" do
+          let(:params) { { sort_by: "created_at", order: "desc" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([newest.id, oldest.id])
+          end
+        end
+      end
+
+      context "when sorting by applied_at" do
+        let!(:newest_app) { create(:job, user: user, applied_at: 1.day.ago) }
+        let!(:oldest_app) { create(:job, user: user, applied_at: 3.weeks.ago) }
+
+        before do
+          get api_v1_jobs_path, headers: headers, params: params
+        end
+
+        context "without order param" do
+          let(:params) { { sort_by: "applied_at" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([newest_app.id, oldest_app.id])
+          end
+        end
+
+        context "with order asc" do
+          let(:params) { { sort_by: "applied_at", order: "asc" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([oldest_app.id, newest_app.id])
+          end
+        end
+
+        context "with order desc" do
+          let(:params) { { sort_by: "applied_at", order: "desc" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([newest_app.id, oldest_app.id])
+          end
+        end
+      end
+
+      context "when sorting by title" do
+        let!(:associate) { create(:job, user: user, title: "Associate") }
+        let!(:zen_master) { create(:job, user: user, title: "Zen Master") }
+
+        before do
+          get api_v1_jobs_path, headers: headers, params: params
+        end
+
+        context "without order param" do
+          let(:params) { { sort_by: "title" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([associate.id, zen_master.id])
+          end
+        end
+
+        context "with order desc" do
+          let(:params) { { sort_by: "title", order: "desc" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([zen_master.id, associate.id])
+          end
+        end
+
+        context "with order asc" do
+          let(:params) { { sort_by: "title", order: "asc" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([associate.id, zen_master.id])
+          end
+        end
+      end
+
+      context "when sorting by company" do
+        let!(:armadillo) { create(:job, user: user, company: "Armadillo Inc") }
+        let!(:zebra) { create(:job, user: user, company: "Zebra LLC") }
+
+        before do
+          get api_v1_jobs_path, headers: headers, params: params
+        end
+
+        context "without order param" do
+          let(:params) { { sort_by: "company" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([armadillo.id, zebra.id])
+          end
+        end
+
+        context "with order desc" do
+          let(:params) { { sort_by: "company", order: "desc" } }
+
+          it "sorts descending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([zebra.id, armadillo.id])
+          end
+        end
+
+        context "with order asc" do
+          let(:params) { { sort_by: "company", order: "asc" } }
+
+          it "sorts ascending" do
+            expect(json_response["jobs"].map { |j| j["id"] })
+              .to eq([armadillo.id, zebra.id])
+          end
+        end
+      end
+    end
+
+    context "with pagination params" do
+      before do
+        Array.new(25) do |i|
+          create(
+            :job,
+            user: user,
+            title: "Job #{i + 1}",
+            created_at: i.minutes.ago
+          )
+        end
+
+        get api_v1_jobs_path,
+            headers: headers,
+            params: { page: 3, per_page: 10 }
+      end
+
+      it "limits results to per_page" do
+        expect(json_response["jobs"].count).to eq(5)
+      end
+
+      it "returns result based on page offset" do
+        expect(json_response["jobs"].first["title"]).to eq("Job 21")
+      end
+
+      it "returns total count" do
+        expect(json_response.dig("pagination", "total_count")).to eq(25)
+      end
     end
   end
 
