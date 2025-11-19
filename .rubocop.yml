@@ -29,10 +29,6 @@ Style/Documentation:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
-# use Shoulda for one-liners
-RSpec/ImplicitExpect:
-  Enabled: false
-
 # Allow longer method lengths for API controllers
 Metrics/MethodLength:
   Max: 15
@@ -78,6 +74,10 @@ Rails/UnknownEnv:
     - development
     - test
 
+Rails/Pluck:
+  Exclude:
+    - 'spec/requests/**/*'
+
 # RSpec-specific configurations
 RSpec/ExampleLength:
   Max: 10
@@ -87,6 +87,13 @@ RSpec/MultipleExpectations:
 
 RSpec/NestedGroups:
   Max: 4
+
+RSpec/LetSetup:
+  Enabled: true
+
+# use Shoulda for one-liners
+RSpec/ImplicitExpect:
+  Enabled: false
 
 # Performance cops
 Performance:

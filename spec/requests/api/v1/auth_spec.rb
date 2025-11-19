@@ -1,10 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Auths", type: :request do
-  let(:json_response) do
-    response.body.present? ? response.parsed_body : {}
-  end
-
   describe "POST /api/v1/auth/signup" do
     before do
       post api_v1_auth_signup_path,

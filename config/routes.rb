@@ -3,9 +3,13 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      post 'auth/signup', to: 'auth#signup'
-      post 'auth/login', to: 'auth#login'
-      get 'auth/me', to: 'auth#me'
+      namespace :auth do
+        post :signup
+        post :login
+        get :me
+      end
+
+      resources :jobs, only: %i[index create update destroy]
     end
   end
 

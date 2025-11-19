@@ -1,4 +1,6 @@
 class Api::V1::AuthController < ApplicationController
+  before_action :authorize_request, only: [:me]
+
   def signup
     user = User.create(user_params)
 
@@ -23,11 +25,7 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def me
-    if authorize_request
-      auth_response(@current_user)
-    else
-      error_response("Unauthorized")
-    end
+    auth_response(@current_user)
   end
 
   private
@@ -41,14 +39,9 @@ class Api::V1::AuthController < ApplicationController
   end
 
   def auth_response(user, status: :ok)
-    render json: { user: { email: user.email }, token: user_token(user) },
-           status: status
-  end
-
-  def authorize_request
-    header = request.headers["Authorization"]
-    token = header.split.last if header.present?
-    decoded = JwtService.decode(token)
-    @current_user = User.find_by(id: decoded["user_id"]) if decoded
+    render_response(
+      { user: { email: user.email }, token: user_token(user) },
+      status: status
+    )
   end
 end
