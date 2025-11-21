@@ -31,7 +31,7 @@ gem "sidekiq"
 gem "bootsnap", require: false
 
 # Agnostic pagination in plain ruby [https://github.com/ddnexus/pagy]
-gem "pagy", "~> 43.0"
+gem "pagy", "~> 43.1"
 
 group :development, :test do
   # Static analysis scanner for security vulnerabilities. [https://brakemanscanner.org]
