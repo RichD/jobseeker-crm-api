@@ -4,7 +4,7 @@ class Api::V1::JobsController < ApplicationController
   PER_PAGE = 10
 
   before_action :authorize_request
-  before_action :set_job, only: %i[update destroy]
+  before_action :set_job, only: %i[show update destroy]
   before_action :set_jobs, only: :index
 
   def index
@@ -19,6 +19,10 @@ class Api::V1::JobsController < ApplicationController
         }
       }
     )
+  end
+
+  def show
+    render_response({ job: @job }, status: :ok)
   end
 
   def create

@@ -348,6 +348,51 @@ RSpec.describe "Api::V1::Jobs", type: :request do
     end
   end
 
+  describe "GET /api/v1/jobs/:id" do
+    let!(:job) { create(:job, user: user) }
+    let(:another_user) { create(:user) }
+
+    before do
+      get api_v1_job_path(job.id), headers: headers
+    end
+
+    context "when user retrieves own job" do
+      it "returns 200" do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it "returns job data" do
+        expect(json_response.dig("job", "id")).to eq(job.id)
+        expect(json_response.dig("job", "title")).to eq(job.title)
+        expect(json_response.dig("job", "company")).to eq(job.company)
+      end
+    end
+
+    context "when user tries to retrieve another user's job" do
+      let!(:job) { create(:job, user: another_user) }
+
+      it "returns 404" do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when job does not exist" do
+      let!(:job) { double(id: 99999) }
+
+      it "returns 404" do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "without authentication" do
+      let(:headers) { {} }
+
+      it "returns 401" do
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
+
   describe "POST /api/v1/jobs" do
     subject(:created_job) { Job.last }
 

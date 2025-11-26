@@ -9,7 +9,7 @@ Rails.application.routes.draw do
         get :me
       end
 
-      resources :jobs, only: %i[index create update destroy]
+      resources :jobs, only: %i[index show create update destroy]
     end
   end
 
