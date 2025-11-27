@@ -22,10 +22,10 @@ gem "jwt"
 gem "rack-cors"
 
 # In-memory data store for caching and session storage. [https://github.com/redis/redis-rb]
-gem "redis", ">= 4.0.1"
+# gem "redis", ">= 4.0.1"
 
 # Background job processing framework. [https://github.com/sidekiq/sidekiq]
-gem "sidekiq"
+# gem "sidekiq"
 
 # Boot time optimization through caching. [https://github.com/Shopify/bootsnap]
 gem "bootsnap", require: false

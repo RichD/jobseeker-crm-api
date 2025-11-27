@@ -234,10 +234,6 @@ GEM
       erb
       psych (>= 4.0.0)
       tsort
-    redis (5.4.1)
-      redis-client (>= 0.22.0)
-    redis-client (0.26.1)
-      connection_pool
     regexp_parser (2.11.3)
     reline (0.6.3)
       io-console (~> 0.5)
@@ -289,12 +285,6 @@ GEM
     securerandom (0.4.1)
     shoulda-matchers (6.5.0)
       activesupport (>= 5.2.0)
-    sidekiq (8.0.9)
-      connection_pool (>= 2.5.0)
-      json (>= 2.9.0)
-      logger (>= 1.6.2)
-      rack (>= 3.1.0)
-      redis-client (>= 0.23.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -345,14 +335,12 @@ DEPENDENCIES
   puma (>= 5.0)
   rack-cors
   rails (~> 8.0.2, >= 8.0.2.1)
-  redis (>= 4.0.1)
   rspec-rails (~> 6.1)
   rubocop
   rubocop-performance
   rubocop-rails
   rubocop-rspec
   shoulda-matchers (~> 6.0)
-  sidekiq
   simplecov
 
 RUBY VERSION
