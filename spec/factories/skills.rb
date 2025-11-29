@@ -9,7 +9,7 @@ FactoryBot.define do
     trait :with_aliases do
       name { "Ruby on Rails" }
       slug { "ruby-on-rails" }
-      aliases { ["Rails", "RoR"] }
+      aliases { %w[Rails RoR] }
       category { "framework" }
     end
 

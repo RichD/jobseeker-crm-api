@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe JobSkill, type: :model do
-  subject { build(:job_skill) }
+  subject(:job_skill) { build(:job_skill) }
 
   describe "associations" do
     it { should belong_to(:job) }
@@ -10,7 +10,7 @@ RSpec.describe JobSkill, type: :model do
 
   describe "validations" do
     it do
-      should validate_inclusion_of(:classification).in_array(
+      expect(job_skill).to validate_inclusion_of(:classification).in_array(
         %w[required preferred mentioned]
       )
     end
@@ -39,16 +39,18 @@ RSpec.describe JobSkill, type: :model do
 
   describe "#years_required" do
     context "when nil" do
-      before { subject.years_required = nil }
+      before { job_skill.years_required = nil }
+
       it { is_expected.to be_valid }
     end
 
     context "when a number" do
-      before { subject.years_required = 5 }
+      before { job_skill.years_required = 5 }
+
       it { is_expected.to be_valid }
 
       it "stores the value" do
-        expect(subject.years_required).to eq(5)
+        expect(job_skill.years_required).to eq(5)
       end
     end
   end

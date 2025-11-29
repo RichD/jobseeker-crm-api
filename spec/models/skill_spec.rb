@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Skill, type: :model do
-  subject { build(:skill) }
+  subject(:skill) { build(:skill) }
 
   describe "associations" do
     it { should have_many(:job_skills).dependent(:destroy) }
@@ -10,8 +10,9 @@ RSpec.describe Skill, type: :model do
 
   describe "validations" do
     it { should validate_uniqueness_of(:slug) }
+
     it do
-      should validate_inclusion_of(:category).in_array(
+      expect(skill).to validate_inclusion_of(:category).in_array(
         %w[language framework database tool cloud methodology soft_skill]
       )
     end
@@ -20,25 +21,25 @@ RSpec.describe Skill, type: :model do
   describe "#slug" do
     context "when slug is blank" do
       before do
-        subject.name = "Ruby on Rails"
-        subject.slug = nil
-        subject.valid?
+        skill.name = "Ruby on Rails"
+        skill.slug = nil
+        skill.valid?
       end
 
       it "generates slug from name" do
-        expect(subject.slug).to eq("ruby-on-rails")
+        expect(skill.slug).to eq("ruby-on-rails")
       end
     end
 
     context "when slug exists" do
       before do
-        subject.name = "Ruby on Rails"
-        subject.slug = "custom-slug"
-        subject.valid?
+        skill.name = "Ruby on Rails"
+        skill.slug = "custom-slug"
+        skill.valid?
       end
 
       it "does not override existing slug" do
-        expect(subject.slug).to eq("custom-slug")
+        expect(skill.slug).to eq("custom-slug")
       end
     end
   end
@@ -57,12 +58,14 @@ RSpec.describe Skill, type: :model do
 
   describe "#category" do
     context "with valid category" do
-      before { subject.category = "language" }
+      before { skill.category = "language" }
+
       it { is_expected.to be_valid }
     end
 
     context "with invalid category" do
-      before { subject.category = "invalid" }
+      before { skill.category = "invalid" }
+
       it { is_expected.not_to be_valid }
     end
   end
