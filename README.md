@@ -6,12 +6,15 @@ A RESTful API backend for tracking job applications, built with Ruby on Rails 8 
 
 **Frontend Demo:** https://jobseeker-crm-web-dusky.vercel.app
 
+**API Documentation:** Interactive API docs coming soon at `/api-docs`
+
 ---
 
 ## Features
 
 - 🔐 **JWT Authentication** - Secure signup, login, and token-based auth
 - 📝 **Job Management** - Full CRUD operations for job applications
+- 🎯 **Skill Management** - Track required skills with bulk operations and suggestions
 - 🔍 **Search & Filter** - Query jobs by title, company, status, and location
 - 📄 **Pagination** - Efficient data loading with Pagy
 - 🌐 **CORS Enabled** - Ready for frontend integration
@@ -222,6 +225,128 @@ Content-Type: application/json
 #### Delete Job
 ```http
 DELETE /api/v1/jobs/:id
+Authorization: Bearer <token>
+```
+
+**Response (204 No Content)**
+
+---
+
+### Job Skills
+
+#### List Job Skills
+```http
+GET /api/v1/jobs/:job_id/skills
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "skills": [
+    {
+      "id": 1,
+      "skill": {
+        "id": 42,
+        "name": "Ruby",
+        "slug": "ruby",
+        "category": "programming_language",
+        "aliases": ["ruby-lang", "ruby on rails"]
+      },
+      "years_required": 5,
+      "classification": "required"
+    }
+  ]
+}
+```
+
+#### Get Suggested Skills
+```http
+GET /api/v1/jobs/:job_id/skills?suggest=true
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+{
+  "suggested_skills": [
+    {
+      "id": 42,
+      "name": "Ruby",
+      "slug": "ruby",
+      "category": "programming_language",
+      "aliases": ["ruby-lang", "ruby on rails"]
+    },
+    {
+      "id": 43,
+      "name": "PostgreSQL",
+      "slug": "postgresql",
+      "category": "database",
+      "aliases": ["postgres", "psql"]
+    }
+  ]
+}
+```
+
+#### Create Job Skills (Bulk)
+```http
+POST /api/v1/jobs/:job_id/skills
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "skills": [
+    {
+      "skill_id": 42,
+      "years_required": 5,
+      "classification": "required"
+    },
+    {
+      "skill_id": 43,
+      "years_required": 3,
+      "classification": "preferred"
+    }
+  ]
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "job_skills": [
+    {
+      "id": 1,
+      "skill": {
+        "id": 42,
+        "name": "Ruby",
+        "slug": "ruby",
+        "category": "programming_language",
+        "aliases": ["ruby-lang", "ruby on rails"]
+      },
+      "years_required": 5,
+      "classification": "required"
+    },
+    {
+      "id": 2,
+      "skill": {
+        "id": 43,
+        "name": "PostgreSQL",
+        "slug": "postgresql",
+        "category": "database",
+        "aliases": ["postgres", "psql"]
+      },
+      "years_required": 3,
+      "classification": "preferred"
+    }
+  ]
+}
+```
+
+**Note:** All skills are validated before creation. If any skill is invalid, no skills are created (all-or-nothing).
+
+#### Delete Job Skill
+```http
+DELETE /api/v1/jobs/:job_id/skills/:id
 Authorization: Bearer <token>
 ```
 

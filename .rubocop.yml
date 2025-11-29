@@ -95,6 +95,9 @@ RSpec/LetSetup:
 RSpec/ImplicitExpect:
   Enabled: false
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 7
+
 # Performance cops
 Performance:
   Enabled: true

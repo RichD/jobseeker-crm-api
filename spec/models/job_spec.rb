@@ -5,6 +5,8 @@ RSpec.describe Job, type: :model do
 
   describe "associations" do
     it { should belong_to(:user) }
+    it { should have_many(:job_skills) }
+    it { should have_many(:skills) }
   end
 
   describe "enums" do

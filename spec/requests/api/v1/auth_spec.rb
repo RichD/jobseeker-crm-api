@@ -82,7 +82,7 @@ RSpec.describe "Api::V1::Auths", type: :request do
       let(:email) { user.email }
       let(:password) { "CorrectPassword123" }
 
-      it "returns 200, returns user + JWT token" do
+      it "returns 200" do
         expect(response).to have_http_status(:ok)
       end
 
@@ -130,7 +130,7 @@ RSpec.describe "Api::V1::Auths", type: :request do
       let(:token) { JwtService.encode(user_id: user.id) }
       let(:headers) { { "Authorization" => "Bearer #{token}" } }
 
-      it "returns 200, returns current user" do
+      it "returns 200" do
         expect(response).to have_http_status(:ok)
       end
 
