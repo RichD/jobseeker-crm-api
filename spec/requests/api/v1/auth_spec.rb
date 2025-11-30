@@ -1,6 +1,49 @@
 require "rails_helper"
 
 RSpec.describe "Api::V1::Auths", type: :request do
+  path "/api/v1/auth/signup" do
+    post "User signup" do
+      tags "Authentication"
+      consumes "application/json"
+      produces "application/json"
+
+      parameter name: :user_params, in: :body, schema: {
+        type: :object,
+        properties: {
+          email: { type: :string, example: "user@example.com" },
+          password: { type: :string, example: "password123" }
+        },
+        required: ["email", "password"]
+      }
+
+      response "201", "user created" do
+        schema type: :object,
+          properties: {
+            token: { type: :string },
+            user: {
+              type: :object,
+              properties: {
+                id: { type: :integer },
+                email: { type: :string }
+              }
+            }
+          }
+
+        let(:email) { "test@example.com" }
+        let(:password) { "password123" }
+
+        run_test!
+      end
+
+      response "422", "invalid request" do
+        let(:email) { "invalid_email" }
+        let(:password) { "password123" }
+
+        run_test!
+      end
+    end
+  end
+
   describe "POST /api/v1/auth/signup" do
     before do
       post api_v1_auth_signup_path,
