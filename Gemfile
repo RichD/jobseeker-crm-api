@@ -31,7 +31,7 @@ gem "rack-cors"
 gem "bootsnap", require: false
 
 # Agnostic pagination in plain ruby [https://github.com/ddnexus/pagy]
-gem "pagy", "~> 43.0"
+gem "pagy", "~> 43.1"
 
 # Serves the OpenAPI JSON/YAML [https://github.com/rswag/rswag]
 gem "rswag-api"
