@@ -47,7 +47,7 @@ group :development, :test do
   gem "brakeman", require: false
 
   # Behavior-driven development testing framework for Rails. [https://github.com/rspec/rspec-rails]
-  gem "rspec-rails", "~> 6.1"
+  gem "rspec-rails", "~> 8.0"
 
   # Test fixture replacement with factories. [https://github.com/thoughtbot/factory_bot_rails]
   gem "factory_bot_rails"
