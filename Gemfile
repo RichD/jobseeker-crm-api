@@ -4,7 +4,7 @@ source "https://rubygems.org"
 ruby "3.4.7"
 
 # Full-stack web application framework. [https://github.com/rails/rails]
-gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+gem "rails", "~> 8.1.1"
 
 # PostgreSQL database adapter for Active Record. [https://github.com/ged/ruby-pg]
 gem "pg", "~> 1.1"
