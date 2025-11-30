@@ -33,12 +33,21 @@ gem "bootsnap", require: false
 # Agnostic pagination in plain ruby [https://github.com/ddnexus/pagy]
 gem "pagy", "~> 43.0"
 
+# Serves the OpenAPI JSON/YAML [https://github.com/rswag/rswag]
+gem "rswag-api"
+
+# Serves the Swagger UI interface [https://github.com/rswag/rswag]
+gem "rswag-ui"
+
+# Silence rswag-ui warning until gem is updated
+gem "ostruct"
+
 group :development, :test do
   # Static analysis scanner for security vulnerabilities. [https://brakemanscanner.org]
   gem "brakeman", require: false
 
   # Behavior-driven development testing framework for Rails. [https://github.com/rspec/rspec-rails]
-  gem "rspec-rails", "~> 6.1"
+  gem "rspec-rails", "~> 8.0"
 
   # Test fixture replacement with factories. [https://github.com/thoughtbot/factory_bot_rails]
   gem "factory_bot_rails"
@@ -51,6 +60,9 @@ group :development, :test do
 
   # Step-through debugging for Pry. [https://github.com/deivid-rodriguez/pry-byebug]
   gem "pry-byebug"
+
+  # Generates Swagger/OpenAPI documentation from RSpec request specs [https://github.com/rswag/rswag]
+  gem "rswag-specs"
 end
 
 group :development do
