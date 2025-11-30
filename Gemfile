@@ -4,7 +4,7 @@ source "https://rubygems.org"
 ruby "3.4.7"
 
 # Full-stack web application framework. [https://github.com/rails/rails]
-gem "rails", "~> 8.0.2", ">= 8.0.2.1"
+gem "rails", "~> 8.1.1"
 
 # PostgreSQL database adapter for Active Record. [https://github.com/ged/ruby-pg]
 gem "pg", "~> 1.1"
@@ -33,6 +33,15 @@ gem "bootsnap", require: false
 # Agnostic pagination in plain ruby [https://github.com/ddnexus/pagy]
 gem "pagy", "~> 43.0"
 
+# Serves the OpenAPI JSON/YAML [https://github.com/rswag/rswag]
+gem "rswag-api"
+
+# Serves the Swagger UI interface [https://github.com/rswag/rswag]
+gem "rswag-ui"
+
+# Silence rswag-ui warning until gem is updated
+gem "ostruct"
+
 group :development, :test do
   # Static analysis scanner for security vulnerabilities. [https://brakemanscanner.org]
   gem "brakeman", require: false
@@ -51,6 +60,9 @@ group :development, :test do
 
   # Step-through debugging for Pry. [https://github.com/deivid-rodriguez/pry-byebug]
   gem "pry-byebug"
+
+  # Generates Swagger/OpenAPI documentation from RSpec request specs [https://github.com/rswag/rswag]
+  gem "rswag-specs"
 end
 
 group :development do
