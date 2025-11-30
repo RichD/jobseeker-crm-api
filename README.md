@@ -6,7 +6,7 @@ A RESTful API backend for tracking job applications, built with Ruby on Rails 8 
 
 **Frontend Demo:** https://jobseeker-crm-web-dusky.vercel.app
 
-**API Documentation:** Interactive API docs coming soon at `/api-docs`
+**API Documentation:** https://jobseeker-crm-api-production.up.railway.app/api-docs.html
 
 ---
 
@@ -36,349 +36,39 @@ A RESTful API backend for tracking job applications, built with Ruby on Rails 8 
 
 ---
 
-## API Endpoints
+## API Documentation
 
-### Authentication
+**Interactive API Documentation:**
+- **Local:** http://localhost:3005/api-docs.html
+- **Production:** https://jobseeker-crm-api-production.up.railway.app/api-docs.html
 
-#### Signup
+Full OpenAPI 3.0 specification with interactive examples for all endpoints:
+- **Authentication** - Signup, login, and JWT token management
+- **Jobs** - CRUD operations with search, filtering, and pagination
+- **Job Skills** - Bulk operations and AI-powered skill suggestions
+
+### Quick Start
+
+All endpoints except signup and login require JWT authentication:
+
 ```http
-POST /api/v1/auth/signup
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
+Authorization: Bearer <your-jwt-token>
 ```
 
-**Response (201 Created):**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "user": {
-    "id": 1,
-    "email": "user@example.com"
-  }
-}
+**Get a token:**
+```bash
+curl -X POST http://localhost:3005/api/v1/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
-#### Login
-```http
-POST /api/v1/auth/login
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "password123"
-}
+**Use the token:**
+```bash
+curl http://localhost:3005/api/v1/jobs \
+  -H "Authorization: Bearer <your-token>"
 ```
 
-**Response (200 OK):**
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiJ9...",
-  "user": {
-    "id": 1,
-    "email": "user@example.com"
-  }
-}
-```
-
-#### Get Current User
-```http
-GET /api/v1/auth/me
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "user": {
-    "id": 1,
-    "email": "user@example.com"
-  }
-}
-```
-
----
-
-### Jobs
-
-#### List Jobs
-```http
-GET /api/v1/jobs?page=1&per_page=10&q=developer&status=applied
-Authorization: Bearer <token>
-```
-
-**Query Parameters:**
-- `page` - Page number (default: 1)
-- `per_page` - Results per page (default: 10)
-- `q` - Search by title or company
-- `status` - Filter by status (saved, applied, interviewing, offer, rejected)
-- `location` - Filter by location
-- `sort_by` - Sort field (created_at, applied_at)
-- `order` - Sort order (asc, desc)
-
-**Response (200 OK):**
-```json
-{
-  "jobs": [
-    {
-      "id": 1,
-      "title": "Senior Rails Developer",
-      "company": "Tech Corp",
-      "url": "https://example.com/job/123",
-      "location": "San Francisco, CA",
-      "status": "applied",
-      "description": "Full-time Rails position...",
-      "notes": "Applied via LinkedIn",
-      "compensation": "$120k-$150k",
-      "applied_at": "2025-11-25T10:00:00.000Z",
-      "created_at": "2025-11-20T14:30:00.000Z",
-      "updated_at": "2025-11-25T10:00:00.000Z"
-    }
-  ],
-  "pagination": {
-    "current_page": 1,
-    "per_page": 10,
-    "total_count": 42,
-    "total_pages": 5
-  }
-}
-```
-
-#### Get Single Job
-```http
-GET /api/v1/jobs/:id
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "job": {
-    "id": 1,
-    "title": "Senior Rails Developer",
-    "company": "Tech Corp",
-    ...
-  }
-}
-```
-
-#### Create Job
-```http
-POST /api/v1/jobs
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "job": {
-    "title": "Senior Rails Developer",
-    "company": "Tech Corp",
-    "url": "https://example.com/job/123",
-    "location": "San Francisco, CA",
-    "status": "saved",
-    "description": "Full-time Rails position...",
-    "notes": "Applied via LinkedIn",
-    "compensation": "$120k-$150k",
-    "applied_at": "2025-11-25T10:00:00.000Z"
-  }
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "job": {
-    "id": 1,
-    "title": "Senior Rails Developer",
-    ...
-  }
-}
-```
-
-#### Update Job
-```http
-PATCH /api/v1/jobs/:id
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "job": {
-    "status": "interviewing",
-    "notes": "Phone screen scheduled for Friday"
-  }
-}
-```
-
-**Response (200 OK):**
-```json
-{
-  "job": {
-    "id": 1,
-    "status": "interviewing",
-    ...
-  }
-}
-```
-
-#### Delete Job
-```http
-DELETE /api/v1/jobs/:id
-Authorization: Bearer <token>
-```
-
-**Response (204 No Content)**
-
----
-
-### Job Skills
-
-#### List Job Skills
-```http
-GET /api/v1/jobs/:job_id/skills
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "skills": [
-    {
-      "id": 1,
-      "skill": {
-        "id": 42,
-        "name": "Ruby",
-        "slug": "ruby",
-        "category": "programming_language",
-        "aliases": ["ruby-lang", "ruby on rails"]
-      },
-      "years_required": 5,
-      "classification": "required"
-    }
-  ]
-}
-```
-
-#### Get Suggested Skills
-```http
-GET /api/v1/jobs/:job_id/skills?suggest=true
-Authorization: Bearer <token>
-```
-
-**Response (200 OK):**
-```json
-{
-  "suggested_skills": [
-    {
-      "id": 42,
-      "name": "Ruby",
-      "slug": "ruby",
-      "category": "programming_language",
-      "aliases": ["ruby-lang", "ruby on rails"]
-    },
-    {
-      "id": 43,
-      "name": "PostgreSQL",
-      "slug": "postgresql",
-      "category": "database",
-      "aliases": ["postgres", "psql"]
-    }
-  ]
-}
-```
-
-#### Create Job Skills (Bulk)
-```http
-POST /api/v1/jobs/:job_id/skills
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "skills": [
-    {
-      "skill_id": 42,
-      "years_required": 5,
-      "classification": "required"
-    },
-    {
-      "skill_id": 43,
-      "years_required": 3,
-      "classification": "preferred"
-    }
-  ]
-}
-```
-
-**Response (201 Created):**
-```json
-{
-  "job_skills": [
-    {
-      "id": 1,
-      "skill": {
-        "id": 42,
-        "name": "Ruby",
-        "slug": "ruby",
-        "category": "programming_language",
-        "aliases": ["ruby-lang", "ruby on rails"]
-      },
-      "years_required": 5,
-      "classification": "required"
-    },
-    {
-      "id": 2,
-      "skill": {
-        "id": 43,
-        "name": "PostgreSQL",
-        "slug": "postgresql",
-        "category": "database",
-        "aliases": ["postgres", "psql"]
-      },
-      "years_required": 3,
-      "classification": "preferred"
-    }
-  ]
-}
-```
-
-**Note:** All skills are validated before creation. If any skill is invalid, no skills are created (all-or-nothing).
-
-#### Delete Job Skill
-```http
-DELETE /api/v1/jobs/:job_id/skills/:id
-Authorization: Bearer <token>
-```
-
-**Response (204 No Content)**
-
----
-
-### Error Responses
-
-**401 Unauthorized:**
-```json
-{
-  "error": "Unauthorized"
-}
-```
-
-**404 Not Found:**
-```json
-{
-  "error": "Job not found"
-}
-```
-
-**422 Unprocessable Entity:**
-```json
-{
-  "errors": {
-    "title": ["can't be blank"],
-    "company": ["can't be blank"]
-  }
-}
-```
+For complete request/response examples, parameter descriptions, and schemas, visit the interactive documentation above
 
 ---
 
