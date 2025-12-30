@@ -7,7 +7,7 @@ ruby "3.4.7"
 gem "rails", "~> 8.0.2", ">= 8.0.2.1"
 
 # PostgreSQL database adapter for Active Record. [https://github.com/ged/ruby-pg]
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.6"
 
 # Fast, concurrent web server for Ruby/Rack applications. [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
