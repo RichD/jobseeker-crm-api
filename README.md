@@ -1,147 +1,118 @@
 # JobSeeker CRM API
 
-A RESTful API backend for tracking job applications, built with Ruby on Rails 8 and PostgreSQL.
+A Rails 8 REST API demonstrating modern API architecture patterns.
 
-**Live API:** https://jobseeker-crm-api-production.up.railway.app
-
-**Frontend Demo:** https://jobseeker-crm-web-dusky.vercel.app
-
-**API Documentation:** https://jobseeker-crm-api-production.up.railway.app/api-docs.html
+**Portfolio project** built during my job search to explore Rails API-only mode, JWT authentication, and OpenAPI documentation.
 
 ---
 
-## Features
+## Technical Demonstrations
 
-- 🔐 **JWT Authentication** - Secure signup, login, and token-based auth
-- 📝 **Job Management** - Full CRUD operations for job applications
-- 🎯 **Skill Management** - Track required skills with bulk operations and suggestions
-- 🔍 **Search & Filter** - Query jobs by title, company, status, and location
-- 📄 **Pagination** - Efficient data loading with Pagy
-- 🌐 **CORS Enabled** - Ready for frontend integration
-- ✅ **Tested** - RSpec test suite with factory_bot
-- 🚀 **Production Ready** - Deployed on Railway
+**API Architecture:**
+- JWT authentication implementation
+- RESTful resource design
+- OpenAPI 3.0 interactive documentation
+- Query parameters for search/filter/pagination
+- CORS configuration for SPA integration
+
+**Rails 8 Patterns:**
+- API-only mode
+- Custom authentication (no Devise)
+- ActiveRecord with PostgreSQL
+- Modular controller concerns
+
+**Development Setup:**
+- Docker Compose environment
+- Database migrations and seeds
+- RSpec test suite with Factory Bot
+- RuboCop and Brakeman for code quality
 
 ---
 
 ## Tech Stack
 
-- **Ruby** 3.4.7
-- **Rails** 8.0.2
-- **Database** PostgreSQL
-- **Authentication** JWT (JSON Web Tokens)
-- **Pagination** Pagy
-- **Testing** RSpec, Factory Bot, Faker
-- **Code Quality** RuboCop, Brakeman
-- **Deployment** Railway
+- Ruby 3.4.7
+- Rails 8.0.2
+- PostgreSQL
+- JWT (JSON Web Tokens)
+- RSpec, Factory Bot, Faker
+- Docker
+
+---
+
+## Scope
+
+**What's included:**
+- User signup/login with JWT tokens
+- Basic CRUD for job applications
+- Search by title/company
+- Filter by status
+- Skill management per job
+- Pagination with Pagy
+
+**Intentionally kept simple** to demonstrate core API patterns. Focus is on clean architecture and standard REST practices.
+
+---
+
+## Quick Start
+
+### With Docker (Recommended)
+
+```bash
+git clone https://github.com/RichD/jobseeker-crm-api.git
+cd jobseeker-crm-api
+
+# Start services
+docker-compose up
+
+# In another terminal, setup database
+docker-compose exec web rails db:create db:migrate db:seed
+
+# API available at http://localhost:3000
+```
+
+### Local Development
+
+**Requirements:** Ruby 3.4.7, PostgreSQL 14+
+
+```bash
+bundle install
+cp .env.example .env  # Edit with your config
+rails db:create db:migrate db:seed
+rails server
+```
 
 ---
 
 ## API Documentation
 
-**Interactive API Documentation:**
-- **Local:** http://localhost:3005/api-docs.html
-- **Production:** https://jobseeker-crm-api-production.up.railway.app/api-docs.html
+**Interactive OpenAPI docs available at:**
+- Local: http://localhost:3000/api-docs.html
 
-Full OpenAPI 3.0 specification with interactive examples for all endpoints:
-- **Authentication** - Signup, login, and JWT token management
-- **Jobs** - CRUD operations with search, filtering, and pagination
-- **Job Skills** - Bulk operations and AI-powered skill suggestions
+Includes full request/response examples for all endpoints.
 
-### Quick Start
+### Authentication Flow
 
-All endpoints except signup and login require JWT authentication:
-
-```http
-Authorization: Bearer <your-jwt-token>
-```
-
-**Get a token:**
 ```bash
-curl -X POST http://localhost:3005/api/v1/auth/signup \
+# Signup
+curl -X POST http://localhost:3000/api/v1/auth/signup \
   -H "Content-Type: application/json" \
   -d '{"email": "user@example.com", "password": "password123"}'
-```
 
-**Use the token:**
-```bash
-curl http://localhost:3005/api/v1/jobs \
+# Login
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
+# Returns: { "token": "eyJhbG..." }
+
+# Use token
+curl http://localhost:3000/api/v1/jobs \
   -H "Authorization: Bearer <your-token>"
-```
-
-For complete request/response examples, parameter descriptions, and schemas, visit the interactive documentation above
-
----
-
-## Installation & Setup
-
-### Prerequisites
-- Ruby 3.4.7
-- PostgreSQL 14+
-
-### Local Development
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/RichD/jobseeker-crm-api.git
-   cd jobseeker-crm-api
-   ```
-
-2. **Install dependencies:**
-   ```bash
-   bundle install
-   ```
-
-3. **Setup environment variables:**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-4. **Setup database:**
-   ```bash
-   rails db:create
-   rails db:migrate
-   rails db:seed  # Optional: create sample data
-   ```
-
-5. **Start the server:**
-   ```bash
-   rails server
-   ```
-
-   API will be available at `http://localhost:3000`
-
-### Quick Start with Docker
-
-If you have Docker and Docker Compose installed, you can get the app running with one command:
-
-```bash
-# Start all services (Rails + PostgreSQL)
-docker-compose up
-
-# In a separate terminal, run migrations
-docker-compose exec web rails db:create db:migrate db:seed
-```
-
-API will be available at `http://localhost:3000`
-
-**Useful Docker commands:**
-```bash
-# Run Rails console
-docker-compose exec web rails console
-
-# Run tests
-docker-compose exec web bundle exec rspec
-
-# Stop all services
-docker-compose down
 ```
 
 ---
 
 ## Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
 
 ```bash
 # Database
@@ -151,107 +122,39 @@ DATABASE_URL=postgresql://user:password@localhost:5432/jobseeker_crm_development
 RAILS_ENV=development
 RAILS_MASTER_KEY=your_master_key_here
 
-# JWT Authentication
+# JWT
 JWT_SECRET_KEY=your_secret_key_here
 
-# CORS (comma-separated)
-ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend-domain.com
+# CORS
+ALLOWED_ORIGINS=http://localhost:5173,https://your-frontend.com
 ```
 
-See `.env.example` for a complete list of configuration options.
-
----
-
-## Deployment
-
-### Deploy to Railway
-
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template)
-
-1. Click the "Deploy on Railway" button
-2. Connect your GitHub repository
-3. Set environment variables:
-   - `DATABASE_URL` (automatically provided by Railway PostgreSQL)
-   - `RAILS_MASTER_KEY` (generate with `rails credentials:edit`)
-   - `JWT_SECRET_KEY` (generate with `rails secret`)
-4. Deploy!
-
-### Manual Deployment
-
-1. **Push code to GitHub:**
-   ```bash
-   git push origin main
-   ```
-
-2. **Create Railway project:**
-   - New Project → Deploy from GitHub
-   - Select repository
-
-3. **Add PostgreSQL:**
-   - New → Database → PostgreSQL
-
-4. **Set environment variables in Railway dashboard**
-
-5. **Deploy automatically on push**
+See `.env.example` for complete configuration.
 
 ---
 
 ## Development
 
-### Running Tests
-
 ```bash
-# Run all tests
+# Run tests
 bundle exec rspec
 
-# Run specific test file
-bundle exec rspec spec/models/job_spec.rb
-
-# Run with coverage report
-COVERAGE=true bundle exec rspec
-```
-
-### Code Quality
-
-```bash
-# Run RuboCop linter
+# Run linter
 bundle exec rubocop
 
-# Auto-fix RuboCop offenses
+# Auto-fix linting issues
 bundle exec rubocop -A
 
-# Run Brakeman security scanner
+# Security scan
 bundle exec brakeman
-```
 
-### Database Operations
-
-```bash
-# Create migration
-rails generate migration AddFieldToJobs field:string
-
-# Run migrations
-rails db:migrate
-
-# Rollback migration
-rails db:rollback
-
-# Reset database (⚠️ deletes all data)
-rails db:reset
-```
-
-### Console
-
-```bash
-# Start Rails console
+# Rails console
 rails console
 
-# Create a user
-User.create(email: 'test@example.com', password: 'password')
-
-# Create a job
-user = User.first
-user.jobs.create(title: 'Developer', company: 'Tech Corp', status: 'saved')
+# Database operations
+rails db:migrate
+rails db:rollback
+rails db:reset
 ```
 
 ---
@@ -261,64 +164,32 @@ user.jobs.create(title: 'Developer', company: 'Tech Corp', status: 'saved')
 ```
 jobseeker-crm-api/
 ├── app/
-│   ├── controllers/
-│   │   └── api/v1/       # API controllers
-│   ├── models/           # ActiveRecord models
+│   ├── controllers/api/v1/    # API controllers
+│   ├── models/                # ActiveRecord models
 │   └── ...
 ├── config/
-│   ├── initializers/
-│   │   └── cors.rb       # CORS configuration
-│   └── routes.rb         # API routes
+│   ├── initializers/cors.rb   # CORS config
+│   └── routes.rb              # API routes
 ├── db/
-│   ├── migrate/          # Database migrations
-│   └── seeds.rb          # Seed data
-├── spec/                 # RSpec tests
+│   ├── migrate/               # Database migrations
+│   └── seeds.rb               # Seed data
+├── spec/                      # RSpec tests
+├── docker-compose.yml         # Development environment
 └── ...
 ```
 
 ---
 
-## Contributing
+## Related Projects
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests and linters:
-   ```bash
-   bundle exec rspec
-   bundle exec rubocop
-   bundle exec brakeman
-   ```
-5. Commit your changes (`git commit -m 'Add amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-### Code Style
-
-- Follow [Ruby Style Guide](https://rubystyle.guide/)
-- Use RuboCop for linting (configuration in `.rubocop.yml`)
-- Write tests for new features
-- Keep test coverage above 90%
+**Frontend:** [jobseeker-crm-web](https://github.com/RichD/jobseeker-crm-web) - React + TypeScript client
 
 ---
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License
 
 ---
 
-## Related Projects
-
-- **Frontend:** [jobseeker-crm-web](https://github.com/RichD/jobseeker-crm-web) - React + TypeScript frontend
-
----
-
-## Support
-
-- 🐛 [Report a bug](https://github.com/RichD/jobseeker-crm-api/issues)
-- 💡 [Request a feature](https://github.com/RichD/jobseeker-crm-api/issues)
-
----
-
-**Built with ❤️ using Ruby on Rails**
+**Built to explore Rails 8 API patterns**
