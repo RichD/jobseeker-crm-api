@@ -72,5 +72,5 @@ group :test do
   gem "simplecov", require: false
 
   # RSpec matchers for common Rails functionality. [https://github.com/thoughtbot/shoulda-matchers]
-  gem "shoulda-matchers", "~> 6.0"
+  gem "shoulda-matchers", "~> 7.0"
 end
